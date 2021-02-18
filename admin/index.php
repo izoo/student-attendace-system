@@ -309,12 +309,17 @@ else
             ><i class="treeview-indicator fa fa-angle-right"></i
           ></a>
           <ul class="treeview-menu">
-
+          <?php 
+          if($results['role'] == "admin"  || $results['role'] == "lecturer" )
+          {
+            ?>
             <li>
               <a class="treeview-item" href="#" data-id="add-attendance"
                 ><i class="icon fa fa-circle-o"></i>Add Attendance</a>
             </li>
-          
+            <?php
+          }
+          ?>
             <li>
               <a class="treeview-item" href="#" data-id="view-attendance"
                 ><i class="icon fa fa-circle-o"></i>View  Attendance</a>
@@ -527,6 +532,7 @@ else
                                             </div>
 
                                         </div>
+
                                         <!-- <div class="form-group">
                                             <div class="custom-control custom-checkbox checkbox-success">
                                                 <input type="checkbox" class="custom-control-input" id="checkbox-signup">
@@ -1138,7 +1144,7 @@ else if($results['role'] == "student" || $results['role'] == "lecturer" )
                                             </div>
                                             <div class="form-group col-md-12 col-lg-12 col-sm-12">
                                                 <label for="emailaddress">Phone No</label>
-                                                <input class="form-control" type="number" id="phone_no" name="phone_no" required placeholder="Enter Staff ID">
+                                                <input class="form-control" type="number" id="phone_no" name="phone_no" required placeholder="Enter Phone No">
                                             </div>
                                         </div>
                                       

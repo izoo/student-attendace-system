@@ -20,8 +20,35 @@ if(isset($_POST['fullname']) && isset($_POST['email'])
     $semester = $user->testinput($_POST['semester']);
     $course = $user->testinput($_POST['course']);
     $department = $user->testinput($_POST['department']);
+    if($user->is_loggedin()!="")
+        {
+            $user_id = $_SESSION['user_session'];
+            $stmt=$DB_con->prepare("SELECT * FROM users WHERE email=:ema");
+            $stmt->bindParam(":ema",$user_id);
+            $stmt->execute();
+            $results=$stmt->fetch(PDO::FETCH_ASSOC);
+            if($results['role']=='admin')
+            {
+                $password = $reg_no;
+                $confirm_password = $reg_no;
+            }
+            else
+            {
+                $password = $user->testinput($_POST['password']);
+                $confirm_password = $user->testinput($_POST['confirm_password']);
+            }
+        
+            
+        }
+        else
+        {
+            $password = $user->testinput($_POST['password']);
+            $confirm_password = $user->testinput($_POST['confirm_password']);
+        }
+   
     $rand_no = rand(10000,99999);
     $db_rand_no = md5($rand_no);
+    
     $userData = array(
         'student_name' => $full_name,
         'student_email' => $email,
@@ -31,20 +58,13 @@ if(isset($_POST['fullname']) && isset($_POST['email'])
         'semester' => $semester,
         'course' => $course,
         'dept' => $department,
-        'verification_code' => $db_rand_no,
+        'verification_code' => $db_rand_no
     );
     $conditions = array(
         'student_email' => $email,
         'reg_no' => $reg_no,
     );
-    $userData2 = array(
-        'email' => $email,
-        'name' => $full_name,
-        'mobile_number' => $phone_no,
-        'verification_code' => $db_rand_no,
-        'verified' => 0,
-        'role' => "student"
-    );
+    
     $conditions2 = array(
         'email' => $email,
         'mobile_number' => $phone_no,
@@ -63,10 +83,25 @@ if(isset($_POST['fullname']) && isset($_POST['email'])
         {
             $errors = "Account with similar Email or Mobile No Already Exists";
         }
+        else if($password !== $confirm_password)
+        {
+            $errors =  "Password Mismatch";
+        }
         else
         {
+            $pass= md5($password);
+            $userData2 = array(
+                'email' => $email,
+                'name' => $full_name,
+                'mobile_number' => $phone_no,
+                'verification_code' => $db_rand_no,
+                'password' => $pass,
+                'verified' => 0,
+                'role' => "student"
+            );
             if($user->insert($tableName,$userData) && $user->insert($tableName2,$userData2))
             {
+               
 
                 $output='<p>Hello ' . $full_name . '</p>';
              

@@ -1,11 +1,12 @@
 <?php
 require_once("db_config.php");
-if(isset($_POST['user']) && isset($_POST['password']))
+if(isset($_POST['user']) && isset($_POST['password'])  && isset($_POST['otp']))
 {
     $error = array();
     $username = $_POST['user'];
     $password = $_POST['password'];
-    if(empty($username) && empty($password))
+    $otp = $_POST['otp'];
+    if(empty($username) && empty($password) && empty($otp))
     {
         $error[]="You must Provide both email and OTP Code";
 
@@ -20,7 +21,7 @@ if(isset($_POST['user']) && isset($_POST['password']))
         {
             $error[] = "Invalid Email";
         }
-        else if($user->login($username,$password))
+        else if($user->login($username,$otp,$password))
         {
             echo "OK";
         }

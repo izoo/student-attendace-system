@@ -2,8 +2,8 @@
 class DB
 {
     private $dbHost = "localhost";
-    private $dbUsername = "phpmyadmin";
-    private $dbPassword = "chronixx";
+    private $dbUsername = "root";
+    private $dbPassword = "";
     private $dbName = "attendance";
     private $db;
     public function __construct($DB_con)
@@ -136,12 +136,14 @@ class DB
         }
 
     }
-    public function login($umail,$upass)
+    public function login($umail,$otp,$upass)
 	{
 		try
 		{
-			$stmt = $this->db->prepare("SELECT * FROM users WHERE email=:ema LIMIT 1");
-		    $stmt->bindParam(":ema",$umail);
+            $pass = md5($upass);
+			$stmt = $this->db->prepare("SELECT * FROM users WHERE email=:ema AND password=:pass LIMIT 1");
+            $stmt->bindParam(":ema",$umail);
+            $stmt->bindParam(":pass",$pass);
 			$stmt->execute();
             $userRow=$stmt->fetch(PDO::FETCH_ASSOC);
             $tableName= 'users';
@@ -151,10 +153,12 @@ class DB
             $conditions = array(
                 'email' => $umail
             );
+            // echo  "<br>" . md5($upass) . "<br>";
             $update = $this->update($tableName,$userData,$conditions);
 			if($stmt->rowCount() > 0 && $update)
 			{
-				if($userRow['verification_code']==MD5($upass))
+                // echo  "<br>" . md5($otp) . "<br>";
+				if($userRow['verification_code']==md5($otp))
 				{
 					$_SESSION['user_session'] = $userRow['email'];
 					return true;

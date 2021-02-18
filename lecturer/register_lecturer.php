@@ -14,8 +14,34 @@ if(isset($_POST['fullname']) && isset($_POST['email'])
     $email = $user->testinput($_POST['email']);
     $phone_no = $user->testinput($_POST['phone_no']);
     $staff_id = $user->testinput($_POST['staff_id']);
+    if($user->is_loggedin()!="")
+    {
+        $user_id = $_SESSION['user_session'];
+        $stmt=$DB_con->prepare("SELECT * FROM users WHERE email=:ema");
+        $stmt->bindParam(":ema",$user_id);
+        $stmt->execute();
+        $results=$stmt->fetch(PDO::FETCH_ASSOC);
+        if($results['role']=='admin')
+        {
+            $password = $staff_id;
+            $confirm_password = $staff_id;
+        }
+        else
+        {
+            $password = $user->testinput($_POST['password']);
+            $confirm_password = $user->testinput($_POST['confirm_password']);
+        }
+    
+        
+    }
+    else
+    {
+        $password = $user->testinput($_POST['password']);
+        $confirm_password = $user->testinput($_POST['confirm_password']);
+    }
     $rand_no = rand(10000,99999);
     $db_rand_no = md5($rand_no);
+ ;
     $userData = array(
         'lecturer_name' => $full_name,
         'lecturer_email' => $email,
@@ -28,14 +54,7 @@ if(isset($_POST['fullname']) && isset($_POST['email'])
         'lecturer_staff_id' => $staff_id,
     );
 
-    $userData2 = array(
-        'email' => $email,
-        'name' => $full_name,
-        'mobile_number' => $phone_no,
-        'verification_code' => $db_rand_no,
-        'verified' => 0,
-        'role' => "lecturer"
-    );
+   
     $conditions2 = array(
         'email' => $email,
         'mobile_number' => $phone_no,
@@ -55,11 +74,25 @@ if(isset($_POST['fullname']) && isset($_POST['email'])
         {
             $errors = "Account with similar Email or Mobile No Already Exists";
         }
+        else if($password !== $confirm_password)
+        {
+            $errors =  "Password Mismatch";
+        }
         else
         {
+            $pass= md5($password);
+            $userData2 = array(
+                'email' => $email,
+                'name' => $full_name,
+                'mobile_number' => $phone_no,
+                'verification_code' => $db_rand_no,
+                'password' => $pass,
+                'verified' => 0,
+                'role' => "lecturer"
+            );
             if($user->insert($tableName,$userData) && $user->insert($tableName2,$userData2))
             {
-
+               
                 $output='<p>Hello ' . $full_name . '</p>';
              
                 $output .='<p>Enter The Below OTP Code in the login form</p>';
