@@ -1,8 +1,8 @@
 <?php
 session_start();
 $DB_host = "localhost";
-$DB_user = "phpmyadmin";
-$DB_pass = "chronixx";
+$DB_user = "root";
+$DB_pass = "";
 $DB_name = "attendance";
 
 try
